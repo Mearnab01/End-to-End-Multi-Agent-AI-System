@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TripMate AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <div class="page-bg"></div>
+
+    <main class="app-container">
+      <header class="masthead">
+        <div class="masthead-mark">
+          <i data-lucide="compass"></i>
+          <span>TripMate AI</span>
+        </div>
+        <div class="masthead-tag">
+          Multi-agent itinerary desk &mdash; LangGraph
+        </div>
+      </header>
+
+      <section class="hero-section">
+        <p class="hero-kicker">
+          Flights, stays and a full day-by-day plan, drafted by a crew of agents
+        </p>
+        <h1>Tell it where.<br />It builds the whole trip.</h1>
+        <p class="hero-sub">
+          One request goes out to a flight-search agent, a hotel-search agent
+          and an itinerary planner working together &mdash; you get back a
+          single, bookable plan.
+        </p>
+      </section>
+
+      <section class="ticket">
+        <div class="ticket-main">
+          <div class="ticket-row">
+            <div class="ticket-field">
+              <span class="field-label">Destination brief</span>
+              <span class="field-hint"
+                >e.g. 7 days in Japan from Bangladesh, under 2 lakhs</span
+              >
+            </div>
+            <div class="status-pill">
+              <span class="status-dot"></span>
+              Agents online
+            </div>
+          </div>
+
+          <div class="input-area">
+            <textarea
+              id="userInput"
+              placeholder="Plan a complete 7 day Japan trip including flights, hotels and sightseeing, under 2 lakhs..."
+            ></textarea>
+
+            <button id="sendBtn" onclick="sendMessage()">
+              <span id="btnText">
+                <i data-lucide="send"></i>
+                Build itinerary
+              </span>
+              <span id="btnLoader" class="loader hidden"></span>
+            </button>
+          </div>
+
+          <div class="quick-prompts">
+            <span class="quick-label">Or start from a route</span>
+            <div class="route-chips">
+              <button
+                class="route-chip"
+                onclick="
+                  setPrompt(
+                    'Plan a complete 7 days Japan trip from Bangladesh including flights, hotels and sightseeing under 2 lakhs.',
+                  )
+                "
+              >
+                <span class="route-code">DAC &rarr; NRT</span>
+                <span class="route-name">Japan, 7 days</span>
+              </button>
+              <button
+                class="route-chip"
+                onclick="
+                  setPrompt(
+                    'Plan a 5 days Dubai trip from Dhaka with flights, hotels and sightseeing.',
+                  )
+                "
+              >
+                <span class="route-code">DAC &rarr; DXB</span>
+                <span class="route-name">Dubai, 5 days</span>
+              </button>
+              <button
+                class="route-chip"
+                onclick="
+                  setPrompt(
+                    'Plan a 7 days Thailand trip from Bangladesh with budget hotels and sightseeing.',
+                  )
+                "
+              >
+                <span class="route-code">DAC &rarr; BKK</span>
+                <span class="route-name">Thailand, 7 days</span>
+              </button>
+              <button
+                class="route-chip"
+                onclick="setPrompt('Give me all country flight info.')"
+              >
+                <span class="route-code">ALL</span>
+                <span class="route-name">Global flight info</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="ticket-perf" aria-hidden="true"></div>
+
+        <div class="ticket-stub">
+          <i data-lucide="plane-takeoff"></i>
+          <span>Groq &middot; Tavily &middot; AviationStack</span>
+        </div>
+      </section>
+
+      <section id="resultSection" class="result-section hidden">
+        <div class="result-header">
+          <div class="result-heading">
+            <i data-lucide="notebook-text"></i>
+            <div>
+              <h2>Your itinerary</h2>
+              <p id="threadInfo">Thread ID: -</p>
+            </div>
+          </div>
+
+          <div class="result-actions">
+            <button class="copy-btn" onclick="copyResult()">
+              <i data-lucide="copy"></i>
+              <span class="btn-label">Copy</span>
+            </button>
+            <button class="download-btn" onclick="downloadPDF()">
+              <i data-lucide="download"></i>
+              <span class="btn-label">Save as PDF</span>
+            </button>
+          </div>
+        </div>
+
+        <div id="pdfContent" class="pdf-content">
+          <h1 class="pdf-title">AI Travel Plan</h1>
+          <div id="resultBox" class="result-box"></div>
+        </div>
+      </section>
+
+      <section id="errorBox" class="error-box hidden"></section>
+    </main>
+
+    <footer>
+      <i data-lucide="layers"></i>
+      Built with FastAPI, LangGraph, Groq, PostgreSQL, Tavily and AviationStack
+    </footer>
+
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+    <!-- Markdown Renderer -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <!-- PDF Download Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <!-- Your Custom JS -->
+    <script src="/static/script.js"></script>
+
+    <script>
+      lucide.createIcons();
+    </script>
+  </body>
+</html>
