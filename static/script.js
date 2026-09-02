@@ -1,18 +1,31 @@
 let currentThreadId = localStorage.getItem("travel_thread_id") || null;
 let latestAnswerMarkdown = "";
+let waitingForApproval = false;
+
+const AGENT_LABELS = {
+    flight_agent: "Flight agent",
+    hotel_agent: "Hotel agent",
+    weather_agent: "Weather agent",
+    budget_agent: "Budget agent",
+    itinerary_agent: "Itinerary agent"
+};
 
 function setPrompt(text) {
     document.getElementById("userInput").value = text;
 }
 
-function setLoading(isLoading) {
+function setLoading(isLoading, mode = "draft") {
     const sendBtn = document.getElementById("sendBtn");
     const btnText = document.getElementById("btnText");
     const btnLoader = document.getElementById("btnLoader");
+    const approveBtn = document.getElementById("approveBtn");
+    const reviseBtn = document.getElementById("reviseBtn");
 
     sendBtn.disabled = isLoading;
+    approveBtn.disabled = isLoading;
+    reviseBtn.disabled = isLoading;
 
-    if (isLoading) {
+    if (isLoading && mode === "draft") {
         btnText.classList.add("hidden");
         btnLoader.classList.remove("hidden");
     } else {
@@ -26,6 +39,7 @@ function showError(message) {
 
     errorBox.textContent = message;
     errorBox.classList.remove("hidden");
+    errorBox.scrollIntoView({ behavior: "smooth", block: "center" });
 }
 
 function hideError() {
@@ -35,20 +49,51 @@ function hideError() {
     errorBox.textContent = "";
 }
 
-function showResult(answer, threadId) {
-    latestAnswerMarkdown = answer;
+function showWorkflow(data) {
+    const section = document.getElementById("workflowSection");
+    const reasoning = document.getElementById("supervisorReasoning");
+    const chips = document.getElementById("agentChips");
+    const guardrailBadge = document.getElementById("guardrailBadge");
+
+    reasoning.textContent =
+        data.supervisor_reasoning || "Supervisor routing completed.";
+
+    chips.innerHTML = "";
+
+    (data.selected_agents || []).forEach((agent) => {
+        const chip = document.createElement("span");
+        chip.className = "agent-chip";
+        chip.textContent = AGENT_LABELS[agent] || agent;
+        chips.appendChild(chip);
+    });
+
+    if (data.guardrail_allowed === false) {
+        guardrailBadge.textContent = "Guardrail blocked";
+        guardrailBadge.classList.add("blocked");
+    } else {
+        guardrailBadge.textContent = "Guardrail passed";
+        guardrailBadge.classList.remove("blocked");
+    }
+
+    section.classList.remove("hidden");
+}
+
+function showResult(answer, threadId, isDraft = false) {
+    latestAnswerMarkdown = answer || "";
 
     const resultSection = document.getElementById("resultSection");
     const resultBox = document.getElementById("resultBox");
     const threadInfo = document.getElementById("threadInfo");
+    const resultTitle = document.getElementById("resultTitle");
 
     if (typeof marked !== "undefined") {
-        resultBox.innerHTML = marked.parse(answer);
+        resultBox.innerHTML = marked.parse(latestAnswerMarkdown);
     } else {
-        resultBox.innerText = answer;
+        resultBox.innerText = latestAnswerMarkdown;
     }
 
     threadInfo.textContent = `Thread ID: ${threadId}`;
+    resultTitle.textContent = isDraft ? "Draft itinerary" : "Your itinerary";
 
     resultSection.classList.remove("hidden");
 
@@ -58,8 +103,36 @@ function showResult(answer, threadId) {
     });
 }
 
+function showApproval(data) {
+    waitingForApproval = true;
+
+    const section = document.getElementById("approvalSection");
+    const approvalRequest = document.getElementById("approvalRequest");
+
+    approvalRequest.textContent =
+        data.approval_request ||
+        "Approve the draft below or leave feedback so the itinerary agent can revise it before the final plan is written.";
+
+    section.classList.remove("hidden");
+    section.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function hideApproval() {
+    waitingForApproval = false;
+
+    document.getElementById("approvalSection").classList.add("hidden");
+    document.getElementById("approvalFeedback").value = "";
+}
+
 async function sendMessage() {
     hideError();
+
+    if (waitingForApproval) {
+        showError(
+            "Please approve or revise the current draft before starting another plan."
+        );
+        return;
+    }
 
     const input = document.getElementById("userInput");
     const message = input.value.trim();
@@ -69,7 +142,7 @@ async function sendMessage() {
         return;
     }
 
-    setLoading(true);
+    setLoading(true, "draft");
 
     try {
         const response = await fetch("/api/travel", {
@@ -92,12 +165,67 @@ async function sendMessage() {
         currentThreadId = data.thread_id;
         localStorage.setItem("travel_thread_id", currentThreadId);
 
-        showResult(data.answer, data.thread_id);
+        showWorkflow(data);
 
+        if (data.requires_approval) {
+            showResult(data.itinerary || data.answer, data.thread_id, true);
+            showApproval(data);
+        } else {
+            hideApproval();
+            showResult(data.answer, data.thread_id, false);
+        }
     } catch (error) {
         showError(error.message);
     } finally {
-        setLoading(false);
+        setLoading(false, "draft");
+    }
+}
+
+async function submitApproval(approved) {
+    hideError();
+
+    if (!currentThreadId || !waitingForApproval) {
+        showError("There is no draft waiting for approval.");
+        return;
+    }
+
+    const feedbackInput = document.getElementById("approvalFeedback");
+    const feedback = feedbackInput.value.trim();
+
+    if (!approved && !feedback) {
+        showError("Please enter revision feedback before requesting changes.");
+        feedbackInput.focus();
+        return;
+    }
+
+    setLoading(true, "approval");
+
+    try {
+        const response = await fetch("/api/travel/approve", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                thread_id: currentThreadId,
+                approved: approved,
+                feedback: feedback
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+            throw new Error(data.error || "Could not resume the travel workflow.");
+        }
+
+        showWorkflow(data);
+        hideApproval();
+        showResult(data.answer, data.thread_id, false);
+    } catch (error) {
+        showError(error.message);
+    } finally {
+        setLoading(false, "approval");
     }
 }
 
@@ -180,6 +308,10 @@ function downloadPDF() {
 
 document.addEventListener("keydown", function(event) {
     if (event.ctrlKey && event.key === "Enter") {
-        sendMessage();
+        if (waitingForApproval) {
+            submitApproval(true);
+        } else {
+            sendMessage();
+        }
     }
 });

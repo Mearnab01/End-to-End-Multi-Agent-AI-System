@@ -32,9 +32,9 @@
         </p>
         <h1>Tell it where.<br />It builds the whole trip.</h1>
         <p class="hero-sub">
-          One request goes out to a flight-search agent, a hotel-search agent
-          and an itinerary planner working together &mdash; you get back a
-          single, bookable plan.
+          A supervisor agent reads your request, routes it to the flight, hotel,
+          weather and budget specialists it actually needs, then hands you a
+          draft to approve before the final plan is written.
         </p>
       </section>
 
@@ -119,7 +119,67 @@
 
         <div class="ticket-stub">
           <i data-lucide="plane-takeoff"></i>
-          <span>Groq &middot; Tavily &middot; AviationStack</span>
+          <span
+            >Groq &middot; Tavily &middot; AviationStack &middot;
+            OpenWeather</span
+          >
+        </div>
+      </section>
+
+      <section id="workflowSection" class="workflow-section hidden">
+        <div class="workflow-header">
+          <div class="workflow-heading">
+            <i data-lucide="route"></i>
+            <div>
+              <span class="section-kicker">Supervisor agent</span>
+              <h2>Execution plan</h2>
+            </div>
+          </div>
+          <span id="guardrailBadge" class="guardrail-badge"
+            >Guardrail passed</span
+          >
+        </div>
+        <p id="supervisorReasoning" class="supervisor-reasoning"></p>
+        <div id="agentChips" class="agent-chips"></div>
+      </section>
+
+      <section id="approvalSection" class="approval-section hidden">
+        <div class="approval-header">
+          <i data-lucide="user-check"></i>
+          <div>
+            <span class="section-kicker">Human-in-the-loop</span>
+            <h2>Review the draft itinerary</h2>
+          </div>
+        </div>
+
+        <p id="approvalRequest" class="approval-copy">
+          Approve the draft below or leave feedback so the itinerary agent can
+          revise it before the final plan is written.
+        </p>
+
+        <textarea
+          id="approvalFeedback"
+          class="feedback-input"
+          placeholder="Add revision feedback, for example: reduce the hotel cost and add one free day..."
+        ></textarea>
+
+        <div class="approval-actions">
+          <button
+            id="approveBtn"
+            class="approve-btn"
+            onclick="submitApproval(true)"
+          >
+            <i data-lucide="check"></i>
+            Approve &amp; finalize
+          </button>
+          <button
+            id="reviseBtn"
+            class="revise-btn"
+            onclick="submitApproval(false)"
+          >
+            <i data-lucide="rotate-ccw"></i>
+            Revise with feedback
+          </button>
         </div>
       </section>
 
@@ -128,7 +188,7 @@
           <div class="result-heading">
             <i data-lucide="notebook-text"></i>
             <div>
-              <h2>Your itinerary</h2>
+              <h2 id="resultTitle">Your itinerary</h2>
               <p id="threadInfo">Thread ID: -</p>
             </div>
           </div>
@@ -156,7 +216,8 @@
 
     <footer>
       <i data-lucide="layers"></i>
-      Built with FastAPI, LangGraph, Groq, PostgreSQL, Tavily and AviationStack
+      Built with FastAPI, LangGraph, Groq (GPT-OSS-120B), SQLite, Tavily,
+      AviationStack and OpenWeather
     </footer>
 
     <!-- Icons -->
