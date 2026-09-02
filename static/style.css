@@ -195,10 +195,9 @@ svg[data-lucide], i[data-lucide] {
 }
 
 .input-area {
-    display: grid;
-    grid-template-columns: 1fr 200px;
+    display: flex;
+    flex-direction: column;
     gap: 14px;
-    align-items: stretch;
 }
 
 textarea {
@@ -358,6 +357,205 @@ textarea::placeholder {
     color: var(--rust);
     width: 15px;
     height: 15px;
+}
+
+/* ---------- Workflow section (supervisor + agents) ---------- */
+
+.workflow-section {
+    margin-top: 30px;
+    background: var(--paper-raised);
+    border: 1.5px solid var(--ink);
+    border-radius: 18px;
+    box-shadow: 6px 6px 0 rgba(30, 36, 48, 0.08);
+    padding: 26px 28px;
+}
+
+.workflow-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+}
+
+.workflow-heading {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.workflow-heading svg {
+    color: var(--rust);
+    margin-top: 3px;
+}
+
+.section-kicker {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 3px;
+}
+
+.workflow-heading h2,
+.approval-header h2 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.25rem;
+    color: var(--ink);
+}
+
+.guardrail-badge {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(46, 110, 99, 0.1);
+    color: var(--teal-deep);
+    border: 1px solid rgba(46, 110, 99, 0.28);
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 0.78rem;
+    white-space: nowrap;
+}
+
+.guardrail-badge.blocked {
+    background: rgba(196, 86, 44, 0.1);
+    color: var(--rust);
+    border-color: rgba(196, 86, 44, 0.32);
+}
+
+.supervisor-reasoning {
+    color: var(--ink-soft);
+    font-size: 0.94rem;
+    line-height: 1.6;
+    margin-bottom: 16px;
+}
+
+.agent-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+}
+
+.agent-chip {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--teal-deep);
+    background: rgba(46, 110, 99, 0.08);
+    border: 1px solid rgba(46, 110, 99, 0.24);
+    border-radius: 999px;
+    padding: 6px 13px;
+}
+
+/* ---------- Approval section (human-in-the-loop) ---------- */
+
+.approval-section {
+    margin-top: 30px;
+    background: var(--paper-raised);
+    border: 1.5px solid var(--ink);
+    border-radius: 18px;
+    box-shadow: 6px 6px 0 rgba(30, 36, 48, 0.08);
+    padding: 28px;
+}
+
+.approval-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.approval-header svg {
+    color: var(--teal);
+    margin-top: 3px;
+}
+
+.approval-copy {
+    color: var(--ink-soft);
+    font-size: 0.96rem;
+    line-height: 1.6;
+    margin-bottom: 16px;
+}
+
+.feedback-input {
+    width: 100%;
+    min-height: 90px;
+    resize: vertical;
+    border: 1.5px solid var(--line-strong);
+    border-radius: 12px;
+    background: var(--paper);
+    color: var(--ink);
+    padding: 14px 16px;
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    outline: none;
+    margin-bottom: 18px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.feedback-input:focus-visible {
+    border-color: var(--teal);
+    box-shadow: 0 0 0 3px rgba(46, 110, 99, 0.16);
+}
+
+.feedback-input::placeholder {
+    color: var(--muted);
+}
+
+.approval-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.approve-btn,
+.revise-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-radius: 12px;
+    padding: 11px 18px;
+    cursor: pointer;
+    font-weight: 600;
+    font-family: var(--font-body);
+    font-size: 0.94rem;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.approve-btn {
+    border: 1.5px solid var(--teal-deep);
+    background: var(--teal);
+    color: var(--paper-raised);
+    box-shadow: 3px 3px 0 var(--teal-deep);
+}
+
+.approve-btn:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0 var(--teal-deep);
+}
+
+.revise-btn {
+    border: 1.5px solid var(--ink);
+    background: var(--paper);
+    color: var(--ink);
+    box-shadow: 3px 3px 0 var(--ink);
+}
+
+.revise-btn:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0 var(--ink);
+}
+
+.approve-btn:disabled,
+.revise-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
 }
 
 /* ---------- Result section ---------- */
@@ -617,6 +815,8 @@ footer svg {
     .masthead,
     .hero-section,
     .ticket,
+    .workflow-section,
+    .approval-section,
     footer,
     .result-actions,
     #threadInfo {
@@ -665,8 +865,19 @@ footer svg {
         min-height: 52px;
     }
 
-    .result-section {
+    .result-section,
+    .workflow-section,
+    .approval-section {
         padding: 20px;
+    }
+
+    .approval-actions {
+        flex-direction: column;
+    }
+
+    .approve-btn,
+    .revise-btn {
+        justify-content: center;
     }
 
     .result-actions {

@@ -44,3 +44,6 @@ for file in files:
         print(f"Skipped:  {file}")
 
 print("\nDone.")
+
+
+# To run the code : uvicorn app:app --reload --host 127.0.0.1 --port 8000
