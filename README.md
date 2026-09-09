@@ -146,20 +146,20 @@ The project includes a FastAPI-powered frontend with:
 
 ## 🛠️ Tech Stack
 
-| Layer | Technology |
-|---|---|
-| LLM | Groq / `openai/gpt-oss-120b` |
-| Agent Orchestration | LangGraph |
-| LLM Framework | LangChain |
-| Tool Protocol | MCP |
-| Backend | FastAPI |
-| Persistence | SQLite + LangGraph Checkpointer |
-| Web Search | Tavily |
-| Flight Data | AviationStack |
-| Weather | OpenWeather |
-| Frontend | HTML, CSS, JavaScript |
-| Server | Uvicorn |
-| Containerization | Docker |
+| Layer               | Technology                      |
+| ------------------- | ------------------------------- |
+| LLM                 | Groq / `openai/gpt-oss-120b`    |
+| Agent Orchestration | LangGraph                       |
+| LLM Framework       | LangChain                       |
+| Tool Protocol       | MCP                             |
+| Backend             | FastAPI                         |
+| Persistence         | SQLite + LangGraph Checkpointer |
+| Web Search          | Tavily                          |
+| Flight Data         | AviationStack                   |
+| Weather             | OpenWeather                     |
+| Frontend            | HTML, CSS, JavaScript           |
+| Server              | Uvicorn                         |
+| Containerization    | Docker                          |
 
 ---
 
@@ -215,7 +215,7 @@ The supervisor extracts constraints such as:
 ```json
 {
   "destination": "Japan",
-  "origin": "Bangladesh",
+  "origin": "India",
   "duration": "7 days",
   "budget": "₹2 lakh"
 }
